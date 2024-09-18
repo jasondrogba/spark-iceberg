@@ -1,4 +1,4 @@
-ThisBuild / version := "glue-read"
+ThisBuild / version := "iceberg-read-5000"
 
 ThisBuild / scalaVersion := "2.12.15"
 

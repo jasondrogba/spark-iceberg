@@ -10,19 +10,26 @@ object IcebergGlueExample {
       .getOrCreate()
 
     // 定义数据库和表名
-    val dbName = "mydb4"
-    val tableName = "mytable4"
+    val dbName = "mydb_5000"
+    val tableName = "mytable_5000"
 
-//    // 写入数据到Iceberg表
-//    val data = Seq((1, "Alice", 66), (2, "Bob", 31), (3, "Charlie", 25))
+//    // 写入5000行数据到iceberg表
+//    val data = (1 to 5000).map(i => (i, s"Name_$i", i))
 //    val df = spark.createDataFrame(data).toDF("id", "name", "age")
-//
 //    df.writeTo(s"my_catalog.$dbName.$tableName").createOrReplace()
     println("Data read from Iceberg table!")
     // 从Iceberg表中读取数据
     val icebergDF = spark.read.format("iceberg").load(s"my_catalog.$dbName.$tableName")
-    icebergDF.show()
-    // 停止SparkSession
+    // 统计行数
+    val rowCount = icebergDF.count()
+    println(s"Total number of rows in the table: $rowCount")
+
+    // 获取列数
+    val columnCount = icebergDF.columns.length
+    println(s"Total number of columns in the table: $columnCount")
+
+    // 打印前几行数据以验证
+    icebergDF.show(5)    // 停止SparkSession
     spark.stop()
   }
 }
