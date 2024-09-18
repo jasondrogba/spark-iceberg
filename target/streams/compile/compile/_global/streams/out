@@ -1,0 +1,5 @@
+[0m[[0m[31merror[0m] [0m[0m/Users/sunbury/javawork/jasondrogba/spark-iceberg/src/main/scala/Main.scala:20:59: not enough arguments for method overwrite: (condition: org.apache.spark.sql.Column)Unit.[0m
+[0m[[0m[31merror[0m] [0m[0mUnspecified value parameter condition.[0m
+[0m[[0m[31merror[0m] [0m[0m    df.writeTo(s"my_catalog.$dbName.$tableName").overwrite()[0m
+[0m[[0m[31merror[0m] [0m[0m                                                          ^[0m
+[0m[[0m[31merror[0m] [0m[0mone error found[0m
