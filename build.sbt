@@ -1,4 +1,4 @@
-ThisBuild / version := "iceberg-read-5000-v1"
+ThisBuild / version := "hive-read-5000"
 
 ThisBuild / scalaVersion := "2.12.15"
 
