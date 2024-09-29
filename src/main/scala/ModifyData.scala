@@ -11,7 +11,7 @@ object ModifyData {
 
     // 定义数据库和表名
     val dbName = "mydb_5000"
-    val tableName = "mytable_5000"
+    val tableName = "mytable_5000_v1"
 
     println("Data modified from Iceberg table!")
 

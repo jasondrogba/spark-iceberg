@@ -10,7 +10,7 @@ object AddColumn {
 
     // 定义数据库和表名
     val dbName = "mydb_5000"
-    val tableName = "mytable_5000"
+    val tableName = "mytable_5000_v1"
 
     // 使用 ALTER TABLE 语句添加新列
     spark.sql(

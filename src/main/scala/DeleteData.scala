@@ -10,7 +10,7 @@ object DeleteData {
 
     // 定义数据库和表名
     val dbName = "mydb_5000"
-    val tableName = "mytable_5000"
+    val tableName = "mytable_5000_v1"
 
     // 删除满足条件的记录 (id 在 1 到 500 之间的记录)
     spark.sql(

@@ -11,7 +11,7 @@ object ReadIceberg {
 
     // 定义数据库和表名
     val dbName = "mydb_5000"
-    val tableName = "mytable_5000"
+    val tableName = "mytable_5000_v1"
 
     println("Data read from Iceberg table!")
     // 从Iceberg表中读取数据
