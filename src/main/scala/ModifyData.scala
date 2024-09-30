@@ -1,6 +1,7 @@
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.expressions.Window
+
 object ModifyData {
   def main(args: Array[String]): Unit = {
     // 创建SparkSession，并启用Hive支持
@@ -18,15 +19,24 @@ object ModifyData {
     val dbName = "mydb_5000_2"
     val tableName = "mytable_5000_hive_2"
 
-    val df = spark.table(s"$dbName.$tableName")
+    // 设置Checkpoint目录
+    val checkpointDir = "s3a://alluxio-tpch100/hive-test/checkpoints"
+    spark.sparkContext.setCheckpointDir(checkpointDir)
+
+    // 读取表数据
+    var df = spark.table(s"$dbName.$tableName")
+
+    // 应用Checkpoint
+    df = df.checkpoint()
 
     // 修改前500行的name字段
+    val windowSpec = Window.orderBy("id")
     val updatedDf = df.withColumn("name",
-      when(row_number().over(Window.orderBy("id")) <= 500, "updated_name")
+      when(row_number().over(windowSpec) <= 500, "consistent")
         .otherwise(col("name"))
     )
 
-    // 写回Hive表
+    // 写回Hive表，使用 overwrite 模式
     updatedDf.write.mode("overwrite").saveAsTable(s"$dbName.$tableName")
 
     // 关闭SparkSession
