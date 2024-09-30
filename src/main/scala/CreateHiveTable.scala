@@ -6,14 +6,16 @@ object CreateHiveTable {
     val spark = SparkSession.builder()
       .appName("Hive Table Example")
       .config("spark.master", "local[*]")
-//      .config("spark.sql.warehouse.dir", "s3://your-bucket/path") // S3路径
-//      .config("hive.metastore.uris", "thrift://your-metastore-host:port") // Metastore URI
+      .config("spark.sql.warehouse.dir", "s3a://alluxio-tpch100/hive-test") // S3路径
+      .config("hive.metastore.uris", "thrift://hive-metastore:9083") // Metastore URI
+      .config("spark.hadoop.fs.s3a.access.key", "AKIA3JZIWO4RHLFD7QAK") // AWS Access Key
+      .config("spark.hadoop.fs.s3a.secret.key", "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") // AWS Secret Key
       .enableHiveSupport()
       .getOrCreate()
 
     // 定义数据库和表名
-    val dbName = "mydb_5000"
-    val tableName = "mytable_5000_hive"
+    val dbName = "mydb_5000_2"
+    val tableName = "mytable_5000_hive_2"
 
     // 创建数据库
     spark.sql(s"CREATE DATABASE IF NOT EXISTS $dbName")
