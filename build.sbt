@@ -1,4 +1,4 @@
-ThisBuild / version := "hive-read-5000"
+ThisBuild / version := "tpcds"
 
 ThisBuild / scalaVersion := "2.12.15"
 

@@ -2,18 +2,16 @@ import org.apache.spark.sql.SparkSession
 
 object ReadTPCDS {
   def main(args: Array[String]): Unit = {
-    // 初始化 SparkSession
+    // 创建SparkSession
     val spark = SparkSession.builder()
-      .appName("TPCDS Spark SQL Runner")
+      .appName("Hive Example")
+      .enableHiveSupport()
+      .config("spark.hadoop.fs.s3a.access.key", "AKIA3JZIWO4RHLFD7QAK") // AWS Access Key
+      .config("spark.hadoop.fs.s3a.secret.key", "gNZ9C5HDuMjJj5n3HBGPHT0xyELZ/EhvowA6CN6r") // AWS Secret Key
       .getOrCreate()
 
-    // 设置 S3 配置（如果需要）
-    spark.sparkContext.hadoopConfiguration.set("fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
-    spark.sparkContext.hadoopConfiguration.set("fs.s3a.aws.credentials.provider", "com.amazonaws.auth.DefaultAWSCredentialsProviderChain")
-    // 根据需要设置更多 S3 配置，例如端点、加密等
-
     // 定义 S3 基础路径
-    val s3BasePath = "s3://emr-on-eks-nvme-776937568034-us-east-1/BLOG_TPCDS-TEST-100G-partitioned/"
+    val s3BasePath = "s3a://emr-on-eks-nvme-776937568034-us-east-1/BLOG_TPCDS-TEST-100G-partitioned/"
 
     // 列出所有 TPC-DS 表
     val tables = Seq(
@@ -53,29 +51,40 @@ object ReadTPCDS {
         .createOrReplaceTempView(table)
     }
 
-    // 示例：读取 TPC-DS SQL 文件（假设 SQL 文件存储在 S3 或本地，可以根据需要调整）
-    // 这里假设你有一个包含 TPC-DS 查询的 SQL 字符串
-    val tpcdsSQL = """
-      -- 示例查询：查询销售额最高的前 10 个商品
-      SELECT
-        i_item_id,
-        i_item_desc,
-        SUM(ss_sales_price) AS total_sales
-      FROM
-        catalog_sales
-      JOIN
-        item ON catalog_sales.ss_item_sk = item.i_item_sk
-      GROUP BY
-        i_item_id,
-        i_item_desc
-      ORDER BY
-        total_sales DESC
-      LIMIT 10
+    val tpcdsSQL ="""
+ select i_brand_id brand_id, i_brand brand, i_manufact_id, i_manufact,
+ 	sum(ss_ext_sales_price) ext_price
+ from date_dim, store_sales, item,customer,customer_address,store
+ where d_date_sk = ss_sold_date_sk
+   and ss_item_sk = i_item_sk
+   and i_manager_id = 8
+   and d_moy = 11
+   and d_year = 1998
+   and ss_customer_sk = c_customer_sk
+   and c_current_addr_sk = ca_address_sk
+   and substr(ca_zip,1,5) <> substr(s_zip,1,5)
+   and ss_store_sk = s_store_sk
+ group by i_brand, i_brand_id, i_manufact_id, i_manufact
+ order by ext_price desc, brand, brand_id, i_manufact_id, i_manufact
+ limit 100
     """
 
-    // 执行 SQL 查询
+
+
+
+    // 执行 SQL 查询并测量执行时间
     println("Executing TPC-DS SQL Query...")
+    val startTime = System.nanoTime()
+
     val resultDF = spark.sql(tpcdsSQL)
+
+    // 触发动作以确保查询执行完成
+    resultDF.collect()
+
+    val endTime = System.nanoTime()
+    val durationSeconds = (endTime - startTime) / 1e9
+
+    println(f"SQL Query Execution Time: $durationSeconds%.3f seconds")
 
     // 展示结果
     resultDF.show(truncate = false)
@@ -88,4 +97,3 @@ object ReadTPCDS {
     spark.stop()
   }
 }
-
