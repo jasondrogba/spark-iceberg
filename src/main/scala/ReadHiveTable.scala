@@ -9,13 +9,14 @@ object ReadHiveTable {
       .enableHiveSupport()
       .config("spark.sql.warehouse.dir", "s3a://alluxio-tpch100/hive-test") // S3路径
       .config("hive.metastore.uris", "thrift://hive-metastore:9083") // Metastore URI
+      .config("hive.metastore.warehouse.dir", "file:///opt/hive/warehouse")
       .config("spark.hadoop.fs.s3a.access.key", "AKIA3JZIWO4RHLFD7QAK") // AWS Access Key
       .config("spark.hadoop.fs.s3a.secret.key", "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") // AWS Secret Key
       .getOrCreate()
 
     // 定义数据库和表名
-    val dbName = "mydb_5000_2"
-    val tableName = "mytable_5000_hive_2"
+    val dbName = "mydb_5000_3"
+    val tableName = "mytable_5000_hive_3"
 
     // 创建数据库
     spark.sql(s"CREATE DATABASE IF NOT EXISTS $dbName")
