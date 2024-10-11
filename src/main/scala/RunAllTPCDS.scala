@@ -1,3 +1,4 @@
+// ReadTPCDS.scala
 import org.apache.spark.sql.{SparkSession, Row}
 import org.apache.spark.sql.types.{StructType, StructField, StringType, DoubleType}
 import TPCDSQueries._
@@ -15,6 +16,7 @@ object RunAllTPCDS {
 
     // 定义 S3 基础路径
     val s3BasePath = "s3a://emr-on-eks-nvme-776937568034-us-east-1/BLOG_TPCDS-TEST-100G-partitioned/"
+//    val s3BasePath = "s3a://yuanzhe-tpcds-ap/hive_tpcds_ap/"
 
     // 列出所有 TPC-DS 表
     val tables = Seq(
@@ -36,10 +38,10 @@ object RunAllTPCDS {
     }
 
     // 定义要测试的查询数量和迭代次数
-    val numQueries = 5
-    val numIterations = 3
+    val numQueries = 103
+    val numIterations = 1
 
-    // 选择前5个查询
+    // 选择查询
     val queriesToTest = tpcds1_4Queries.take(numQueries)
 
     // 存储执行时间的列表，列表中的每个元素代表一轮迭代
@@ -47,23 +49,29 @@ object RunAllTPCDS {
 
     // 执行SQL并测量执行时间的函数
     def runQuery(queryId: String, query: String): Double = {
-      println(s"Executing query $queryId...")
-      val startTime = System.nanoTime()
+      try {
+        println(s"Executing query $queryId...")
+        val startTime = System.nanoTime()
 
-      val resultDF = spark.sql(query)
+        val resultDF = spark.sql(query)
 
-      // 触发动作以确保查询执行完成
-      resultDF.collect()
+        // 触发动作以确保查询执行完成
+        resultDF.collect()
 
-      val endTime = System.nanoTime()
-      val durationSeconds = (endTime - startTime) / 1e9
+        val endTime = System.nanoTime()
+        val durationSeconds = (endTime - startTime) / 1e9
 
-      println(f"Query $queryId Execution Time: $durationSeconds%.3f seconds")
+        println(f"Query $queryId Execution Time: $durationSeconds%.3f seconds")
 
-      // 展示部分结果
-      resultDF.show(10, truncate = false)
+        // 展示部分结果
+        resultDF.show(10, truncate = false)
 
-      durationSeconds
+        durationSeconds
+      } catch {
+        case e: Exception =>
+          println(s"Query $queryId failed with exception: ${e.getMessage}")
+          0.0
+      }
     }
 
     // 进行3次迭代
@@ -75,6 +83,7 @@ object RunAllTPCDS {
         iterationTime += (queryId -> duration)
       }
       executionTimes += iterationTime.toMap
+      spark.catalog.clearCache() // 清除缓存，避免影响后续查询
     }
 
     // 创建执行时间的表格
@@ -121,11 +130,10 @@ object RunAllTPCDS {
     rowsDF.show(false)
 
     // 可选：将执行时间保存到CSV文件
-    /*
     rowsDF.coalesce(1).write
       .option("header", "true")
-      .csv("s3a://your-output-bucket/path/to/execution_times.csv")
-    */
+//      .csv("s3a://yuanzhe-tpcds-ap/execution_times_remote.csv")
+      .csv("s3://emr-on-eks-nvme-776937568034-us-east-1/execution_times_tls.csv")
 
     // 停止 SparkSession
     spark.stop()

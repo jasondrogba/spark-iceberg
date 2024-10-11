@@ -1,4 +1,4 @@
-ThisBuild / version := "tpcds"
+ThisBuild / version := "tpcds-tls"
 
 ThisBuild / scalaVersion := "2.12.15"
 
