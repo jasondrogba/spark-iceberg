@@ -133,7 +133,7 @@ object RunAllTPCDS {
     rowsDF.coalesce(1).write
       .option("header", "true")
 //      .csv("s3a://yuanzhe-tpcds-ap/execution_times_remote.csv")
-      .csv("s3://emr-on-eks-nvme-776937568034-us-east-1/execution_times_tls.csv")
+      .csv("s3://emr-on-eks-nvme-776937568034-us-east-1/execution_times_s3_2.csv")
 
     // 停止 SparkSession
     spark.stop()
