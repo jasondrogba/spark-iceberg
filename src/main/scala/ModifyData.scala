@@ -10,8 +10,8 @@ object ModifyData {
       .config("spark.master", "local[*]")
       .config("spark.sql.warehouse.dir", "s3a://alluxio-tpch100/hive-test") // S3路径
       .config("hive.metastore.uris", "thrift://hive-metastore:9083") // Metastore URI
-      .config("spark.hadoop.fs.s3a.access.key", "AKIA3JZIWO4RHLFD7QAK") // AWS Access Key
-      .config("spark.hadoop.fs.s3a.secret.key", "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") // AWS Secret Key
+      .config("spark.hadoop.fs.s3a.access.key", "xxx") // AWS Access Key
+      .config("spark.hadoop.fs.s3a.secret.key", "xxx") // AWS Secret Key
       .enableHiveSupport()
       .getOrCreate()
 
